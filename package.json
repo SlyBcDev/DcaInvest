@@ -2,6 +2,7 @@
   "name": "DCATest",
   "homepage": "https://dcacoin.finance",
   "version": "0.1.0",
+  "engines" : { "node" : ">=0.12" },
   "dependencies": {
     "@agney/react-loading": "^0.1.2",
     "@react-pdf/renderer": "^1.6.12",
