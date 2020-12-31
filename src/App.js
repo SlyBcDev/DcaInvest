@@ -13,6 +13,8 @@ import allowanceReducer from "./store/allowance";
 import myWithdrawReducer from "./store/myWithdrawPlan";
 import myContractReducer from "./store/myDcaContract";
 import blockReducer from "./store/block";
+import DCAPriceReducer from "./store/DCAPrice"
+import rewardReducer from "./store/reward"
 
 
 const rootReducer = combineReducers({
@@ -22,6 +24,8 @@ const rootReducer = combineReducers({
   block : blockReducer,
   myContract: myContractReducer,
   myWithdraw: myWithdrawReducer,
+  DCAPrice : DCAPriceReducer,
+  reward:rewardReducer,
 });
 
 const store = createStore(rootReducer);

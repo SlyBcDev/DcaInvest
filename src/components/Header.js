@@ -3,13 +3,19 @@ import {NavLink, Link} from 'react-router-dom';
 import LineIcon from 'react-lineicons';
 import Web3 from "web3";
 import { useDispatch, useSelector } from "react-redux";
-import {DCAContract,DCAToken, web3} from "../config/contractsConfig";
+import {DCAContract,DCAToken,DCAAddr, web3} from "../config/contractsConfig";
 import {Grid} from '@agney/react-loading';
+import {ChainId, Token, WETH, Fetcher, Route} from "@uniswap/sdk"
+import DCAPriceReducer from '../store/DCAPrice';
+
 
 function Header(){
     const [navigationToggler, setNavigationToggler] = useState(false);
     const accountRedux = useSelector((state) => state.account.address);
     const balanceRedux = useSelector((state) => state.balance.balance);
+    const DCAPriceRedux = useSelector((state) => state.DCAPrice.price);
+    const pendingReward = useSelector((state) => state.reward.pending);
+
 
     const dispatch = useDispatch();
 
@@ -22,6 +28,10 @@ function Header(){
         getBalance()
         getMyContract()
     }, [accountRedux])
+
+    useEffect(()=>{
+      getDCAPrice()
+    },[])
 
     const connectWallet = async ()=>{
         if (window.ethereum) {
@@ -58,6 +68,11 @@ function Header(){
                   payload: 0,
                 })  
             }
+            let reward = await DCAContract.methods.myRewardsStock(accountRedux).call()
+            dispatch({
+              type: "REFRESH_REWARD",
+              payload: (reward/1E18).toFixed(2),
+            })  
         }
 
     }
@@ -90,6 +105,30 @@ function Header(){
       }
     }
 
+    const getDCAPrice = async ()=> {
+      const DCA = new Token(ChainId.KOVAN, DCAAddr,  18);
+      const pair = await Fetcher.fetchPairData(DCA, WETH[DCA.chainId])
+      const route = new Route([pair], WETH[DCA.chainId])
+      
+      const USDC = new Token(ChainId.MAINNET, '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', 6)
+      const DAI = new Token(ChainId.MAINNET, '0x6B175474E89094C44Da98b954EedeAC495271d0F', 18)
+  
+      const USDCWETHPair = await Fetcher.fetchPairData(USDC, WETH[ChainId.MAINNET])
+      const DAIUSDCPair = await Fetcher.fetchPairData(DAI, USDC)
+  
+      const route2 = new Route([USDCWETHPair, DAIUSDCPair], WETH[ChainId.MAINNET])
+  
+      const EthPrice = route2.midPrice.toSignificant(6);
+      const DCAFor1Eth = route.midPrice.toSignificant(6);
+      const DCAPrice = EthPrice/DCAFor1Eth;
+  
+      dispatch({
+        type: "REFRESH_PRICE",
+        payload: DCAPrice.toFixed(6),
+      }) 
+  
+    }
+
 
     return (
         <nav className={navigationToggler ? "mi-header is-visible" : "mi-header"}>
@@ -104,8 +143,10 @@ function Header(){
                         <img src={"../../images/takemymoney.png"} style={{height:180}} alt="good investissor"/>
                     </Link>
                     <span>DCA Finance</span>
+
                     
                 </div>
+                <span>$DCA = {DCAPriceRedux} $</span>
                 
                 {accountRedux.length>0?
                 
@@ -114,7 +155,10 @@ function Header(){
                         {accountRedux.substr(0,6)}...{accountRedux.substr(36,42)}
                         </li>
                         <li>
-                            Balance : {balanceRedux>0?(balanceRedux/1E18).toFixed(2): 0} DCA
+                            Balance : {balanceRedux>0?(balanceRedux/1E18).toFixed(2): 0} $DCA
+                        </li>
+                        <li>
+                            Pending Rewards : {pendingReward>0?pendingReward: 0} $DCA
                         </li>
                         </ul>
                        
@@ -126,6 +170,7 @@ function Header(){
                 }
                               
                 <ul className="mi-header-menu">
+                    <li><NavLink to="/"><span>Home</span></NavLink></li>
                     <li><NavLink to="/DCAContract"><span>My DCA Contract</span></NavLink></li>
                     <li><NavLink to="/WithdrawPlan"><span>My Withdraw Plan</span></NavLink></li>
                 </ul>

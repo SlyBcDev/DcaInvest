@@ -2,10 +2,16 @@
   "name": "DCATest",
   "homepage": "https://dcacoin.finance",
   "version": "0.1.0",
-  "engines" : { "node" : ">=0.12" },
+  "engines": {
+    "node": ">=0.12"
+  },
   "dependencies": {
     "@agney/react-loading": "^0.1.2",
+    "@ethersproject/contracts": "^5.0.8",
+    "@ethersproject/providers": "^5.0.17",
+    "@ethersproject/solidity": "^5.0.7",
     "@react-pdf/renderer": "^1.6.12",
+    "@uniswap/sdk": "^3.0.3",
     "axios": "^0.19.0",
     "axios-mock-adapter": "^1.17.0",
     "bootstrap": "^4.5.3",

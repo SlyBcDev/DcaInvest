@@ -1,15 +1,18 @@
 import React,{useEffect, useState} from "react";
 import Particles from "react-particles-js";
 import Layout from "../components/Layout";
-import {DCAContract,DCAContractAddr,DCAToken, web3} from "../config/contractsConfig";
+import {DCAContract,DCAContractAddr,DCAToken,DCAAddr, web3} from "../config/contractsConfig";
 import {ButtonGroup,ToggleButton, InputGroup,FormControl, Button} from "react-bootstrap"
 import { useDispatch, useSelector } from "react-redux";
 import {Grid} from '@agney/react-loading';
 import Sectiontitle from "../components/Sectiontitle";
 
 
+
 function Home() {
   const accountRedux = useSelector((state) => state.account.address);
+
+
 
   const typeOfContract = [
     {name : "Daily", value:0},
@@ -33,7 +36,6 @@ function Home() {
   useEffect(()=>{
     getReward()
   },[ethValue,periodSelected,contractType])
-
 
   const getReward= async()=> {
     if(ethValue>0){
